@@ -1,6 +1,7 @@
 package dev.ssonsallsub.mycafe.coffeebrand;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 
 import dev.ssonsallsub.mycafe.R;
+import dev.ssonsallsub.mycafe.Utils.Utils;
 
 public class CoffeeBrandListAdapter extends RecyclerView.Adapter<CoffeeBrandListAdapter.CoffeeBrandListViewHolder> {
     private ArrayList<CoffeeBrandData> coffeeBrandDataList;
@@ -47,6 +49,15 @@ public class CoffeeBrandListAdapter extends RecyclerView.Adapter<CoffeeBrandList
         public CoffeeBrandListViewHolder(View itemView) {
             super(itemView);
             logo = itemView.findViewById(R.id.coffee_brand_logo);
+            logo.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int position = getAdapterPosition();
+                    if(position != RecyclerView.NO_POSITION){
+                        Utils.getCafeLocation(position);
+                    }
+                }
+            });
         }
     }
 }

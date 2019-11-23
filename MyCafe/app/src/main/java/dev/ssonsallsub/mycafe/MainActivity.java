@@ -3,15 +3,20 @@ package dev.ssonsallsub.mycafe;
 import android.Manifest;
 import android.app.AlertDialog;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 
-import android.location.Location;
+import android.content.pm.Signature;
+
 import android.location.LocationManager;
 
 import android.os.Bundle;
+import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -32,10 +37,17 @@ import net.daum.mf.map.api.MapReverseGeoCoder;
 import net.daum.mf.map.api.MapView;
 
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
 import dev.ssonsallsub.mycafe.coffeebrand.CoffeeBrandData;
 import dev.ssonsallsub.mycafe.coffeebrand.CoffeeBrandListAdapter;
+import dev.ssonsallsub.mycafe.gps.GpsTracker;
+import dev.ssonsallsub.mycafe.gps.MyCurrentLocation;
+
+import static com.kakao.util.maps.helper.Utility.getPackageInfo;
+
 
 public class MainActivity extends AppCompatActivity
         implements MapView.CurrentLocationEventListener,
@@ -52,9 +64,10 @@ public class MainActivity extends AppCompatActivity
     /*맵 관련*/
     private MapView mMapView;
     private ImageView btn_mylocation;
+    private GpsTracker gpsTracker;
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
     private static final int PERMISSIONS_REQUEST_CODE = 100;
-    String[] REQUIRED_PERMISSIONS = {Manifest.permission.ACCESS_FINE_LOCATION};
+    String[] REQUIRED_PERMISSIONS = {Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_COARSE_LOCATION};
 
 
     @Override
@@ -62,14 +75,16 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        /*주호쌤이 말한 final로 잡고 있어야 한다는게 이거구나...*/
-        final LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        /*KaKao Map 사용을 위한 해시값 구하기
+        * 맵이 갑자기 안뜨면 Appkey 바꾸고
+        * Hash값 다시 뽑아서 등록해보기*/
+        //Log.e("hashKey", getKeyHash(this));
 
         /*기본 맵 띄우기*/
         mMapView = new MapView(this);
         ViewGroup mapViewContainer = findViewById(R.id.map_view);
         mapViewContainer.addView(mMapView);
-        mMapView.setCurrentLocationEventListener(this);
+
 
         if (!checkLocationServicesStatus()) {
             showDialogForLocationServiceSetting();
@@ -84,9 +99,18 @@ public class MainActivity extends AppCompatActivity
         btn_mylocation.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
-                checkRunTimePermission();
-                Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                mMapView.setMapCenterPoint(MapPoint.mapPointWithGeoCoord(location.getLatitude(),location.getLongitude()),true);
+                gpsTracker = new GpsTracker(MainActivity.this);
+                double latitude = gpsTracker.getLatitude();
+                double longitude = gpsTracker.getLongitude();
+
+                Log.d("LocTest","latitude >> " + latitude + ", longitude >> " + longitude);
+
+
+                MyCurrentLocation myCurrentLocation = MyCurrentLocation.getInstance();
+                myCurrentLocation.setMyCurrentLatitude(latitude);
+                myCurrentLocation.setMyCurrentLongitude(longitude);
+
+                mMapView.setMapCenterPoint(MapPoint.mapPointWithGeoCoord(latitude,longitude),true);
             }
         });
 
@@ -114,6 +138,7 @@ public class MainActivity extends AppCompatActivity
         coffeeBrandListView = findViewById(R.id.list_coffee_brand);
         ArrayList<CoffeeBrandData> data = new ArrayList<>();
 
+        data.add(new CoffeeBrandData(R.mipmap.logo_allcafe_round));
         data.add(new CoffeeBrandData(R.mipmap.logo_angelinus_round));
         data.add(new CoffeeBrandData(R.mipmap.logo_caffebene_round));
         data.add(new CoffeeBrandData(R.mipmap.logo_hollys_round));
@@ -315,5 +340,23 @@ public class MainActivity extends AppCompatActivity
         LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
                 || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+    }
+
+
+    public static String getKeyHash(final Context context) {
+        PackageInfo packageInfo = getPackageInfo(context, PackageManager.GET_SIGNATURES);
+        if (packageInfo == null)
+            return null;
+
+        for (Signature signature : packageInfo.signatures) {
+            try {
+                MessageDigest md = MessageDigest.getInstance("SHA");
+                md.update(signature.toByteArray());
+                return Base64.encodeToString(md.digest(), Base64.NO_WRAP);
+            } catch (NoSuchAlgorithmException e) {
+                Log.w("ttttt", "Unable to get MessageDigest. signature=" + signature, e);
+            }
+        }
+        return null;
     }
 }
