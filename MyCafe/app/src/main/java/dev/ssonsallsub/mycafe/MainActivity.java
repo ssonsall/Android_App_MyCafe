@@ -41,6 +41,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
+import dev.ssonsallsub.mycafe.Utils.Utils;
 import dev.ssonsallsub.mycafe.coffeebrand.CoffeeBrandData;
 import dev.ssonsallsub.mycafe.coffeebrand.CoffeeBrandListAdapter;
 import dev.ssonsallsub.mycafe.gps.GpsTracker;
@@ -78,7 +79,7 @@ public class MainActivity extends AppCompatActivity
         /*KaKao Map 사용을 위한 해시값 구하기
         * 맵이 갑자기 안뜨면 Appkey 바꾸고
         * Hash값 다시 뽑아서 등록해보기*/
-        //Log.e("hashKey", getKeyHash(this));
+        Log.d("hashKey", getKeyHash(this));
 
         /*기본 맵 띄우기*/
         mMapView = new MapView(this);
@@ -157,11 +158,10 @@ public class MainActivity extends AppCompatActivity
         linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL); //가로 세팅
 
         coffeeBrandListView.setLayoutManager(linearLayoutManager);
-        coffeeBrandListAdapter = new CoffeeBrandListAdapter();
+        coffeeBrandListAdapter = new CoffeeBrandListAdapter(this);
 
         coffeeBrandListAdapter.setCoffeeBrandData(data);
         coffeeBrandListView.setAdapter(coffeeBrandListAdapter);
-
     }
 
     /*지도 관련해서 GPS 등 메서드 오버라이드*/

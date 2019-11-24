@@ -12,11 +12,18 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
+import dev.ssonsallsub.mycafe.MainActivity;
 import dev.ssonsallsub.mycafe.R;
 import dev.ssonsallsub.mycafe.Utils.Utils;
+import dev.ssonsallsub.mycafe.gps.GpsTracker;
+import dev.ssonsallsub.mycafe.gps.MyCurrentLocation;
 
 public class CoffeeBrandListAdapter extends RecyclerView.Adapter<CoffeeBrandListAdapter.CoffeeBrandListViewHolder> {
     private ArrayList<CoffeeBrandData> coffeeBrandDataList;
+    Context context;
+    public CoffeeBrandListAdapter(Context context) {
+        this.context = context;
+    }
 
     public void setCoffeeBrandData(ArrayList<CoffeeBrandData> list){
         coffeeBrandDataList = list;
@@ -52,9 +59,20 @@ public class CoffeeBrandListAdapter extends RecyclerView.Adapter<CoffeeBrandList
             logo.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    /*세팅된 버튼 순서대로 현재 상태라면 -> 0: all , 2: 엔젤.....*/
                     int position = getAdapterPosition();
                     if(position != RecyclerView.NO_POSITION){
-                        Utils.getCafeLocation(position);
+
+                        /*누른 시점에 내 위치 세팅*/
+                        GpsTracker gpsTracker = new GpsTracker(context);
+                        double latitude = gpsTracker.getLatitude();
+                        double longitude = gpsTracker.getLongitude();
+                        MyCurrentLocation myCurrentLocation = MyCurrentLocation.getInstance();
+                        myCurrentLocation.setMyCurrentLatitude(latitude);
+                        myCurrentLocation.setMyCurrentLongitude(longitude);
+
+                        Utils utils = new Utils();
+                        utils.getCafeLocation(position);
                     }
                 }
             });
