@@ -19,6 +19,11 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,12 +31,15 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import net.daum.mf.map.api.MapPOIItem;
 import net.daum.mf.map.api.MapPoint;
 import net.daum.mf.map.api.MapReverseGeoCoder;
 import net.daum.mf.map.api.MapView;
@@ -41,14 +49,18 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
-import dev.ssonsallsub.mycafe.Utils.Utils;
 import dev.ssonsallsub.mycafe.coffeebrand.CoffeeBrandData;
 import dev.ssonsallsub.mycafe.coffeebrand.CoffeeBrandListAdapter;
 import dev.ssonsallsub.mycafe.gps.GpsTracker;
 import dev.ssonsallsub.mycafe.gps.MyCurrentLocation;
+import dev.ssonsallsub.mycafe.gps.RequestCaffeLocation;
+import dev.ssonsallsub.mycafe.utils.DetailURL;
 
 import static com.kakao.util.maps.helper.Utility.getPackageInfo;
-
+/*
+* 리빌드 할 때 앱 종료하고 하기
+* 찝찝하면 앱 아예 삭제하고 리빌드
+* */
 
 public class MainActivity extends AppCompatActivity
         implements MapView.CurrentLocationEventListener,
@@ -62,13 +74,16 @@ public class MainActivity extends AppCompatActivity
     private TextView btn_close;
     private ImageView btn_more;
 
+
     /*맵 관련*/
     private MapView mMapView;
     private ImageView btn_mylocation;
     private GpsTracker gpsTracker;
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
     private static final int PERMISSIONS_REQUEST_CODE = 100;
-    String[] REQUIRED_PERMISSIONS = {Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_COARSE_LOCATION};
+    CaffeMarkerListener caffeMarkerListener;
+    String[] REQUIRED_PERMISSIONS =
+            {Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_COARSE_LOCATION};
 
 
     @Override
@@ -84,8 +99,14 @@ public class MainActivity extends AppCompatActivity
 
         /*기본 맵 띄우기*/
         mMapView = new MapView(this);
+        /*리스너 객체를 살려둬야하나? 등록하면 계속 살아있는거 아녀?
+        * 아니 그리고 제일 처음에 여기서 세팅했는데 왜 안된거여?
+        * */
+        caffeMarkerListener = new CaffeMarkerListener();
+
         ViewGroup mapViewContainer = findViewById(R.id.map_view);
         mapViewContainer.addView(mMapView);
+
 
 
         if (!checkLocationServicesStatus()) {
@@ -163,6 +184,9 @@ public class MainActivity extends AppCompatActivity
 
         coffeeBrandListAdapter.setCoffeeBrandData(data);
         coffeeBrandListView.setAdapter(coffeeBrandListAdapter);
+
+        mMapView.setPOIItemEventListener(caffeMarkerListener);
+
     }
 
     /*지도 관련해서 GPS 등 메서드 오버라이드*/
@@ -229,13 +253,13 @@ public class MainActivity extends AppCompatActivity
 
             if (check_result) {
                 //위치 값을 가져올 수 있음
+                //파라미터 안먹히네 (확신이 안선다.)
                 //mMapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOnWithHeading);
                 //mMapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOnWithoutHeading);
                 //mMapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOnWithHeadingWithoutMapMoving);
                 mMapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOnWithoutHeadingWithoutMapMoving);
             } else {
                 // 거부한 퍼미션이 있다면 앱을 사용할 수 없는 이유를 설명해주고 앱을 종료합니다.2 가지 경우가 있습니다.
-
                 if (ActivityCompat.shouldShowRequestPermissionRationale(this, REQUIRED_PERMISSIONS[0])) {
 
                     Toast.makeText(MainActivity.this, "퍼미션이 거부되었습니다. 앱을 다시 실행하여 퍼미션을 허용해주세요.", Toast.LENGTH_LONG).show();
@@ -362,5 +386,30 @@ public class MainActivity extends AppCompatActivity
             }
         }
         return null;
+    }
+
+
+    class CaffeMarkerListener implements MapView.POIItemEventListener{
+        @Override
+        public void onPOIItemSelected(MapView mapView, MapPOIItem mapPOIItem) {
+            Log.d("please", "onPOIItemSelected: 1111111111");
+        }
+
+        @Override
+        public void onCalloutBalloonOfPOIItemTouched(MapView mapView, MapPOIItem mapPOIItem) {
+            //사용금지
+        }
+
+        @Override
+        public void onCalloutBalloonOfPOIItemTouched(MapView mapView, MapPOIItem mapPOIItem, MapPOIItem.CalloutBalloonButtonType calloutBalloonButtonType) {
+            Log.d("please", "onPOIItemSelected: 333333333333");
+            //다이얼로그 띄우기
+            DetailURL detailURL = DetailURL.getInstance(); //웹뷰에 띄울 URL
+        }
+
+        @Override
+        public void onDraggablePOIItemMoved(MapView mapView, MapPOIItem mapPOIItem, MapPoint mapPoint) {
+            Log.d("please", "onPOIItemSelected: 444444444444444");
+        }
     }
 }

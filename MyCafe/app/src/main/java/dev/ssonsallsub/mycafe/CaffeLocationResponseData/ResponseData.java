@@ -1,4 +1,4 @@
-package dev.ssonsallsub.mycafe.CaffeLocationResponseData;
+package dev.ssonsallsub.mycafe.caffelocationresponsedata;
 
 
 import java.util.List;

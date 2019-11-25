@@ -1,7 +1,6 @@
 package dev.ssonsallsub.mycafe.coffeebrand;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,9 +13,8 @@ import net.daum.mf.map.api.MapView;
 
 import java.util.ArrayList;
 
-import dev.ssonsallsub.mycafe.MainActivity;
 import dev.ssonsallsub.mycafe.R;
-import dev.ssonsallsub.mycafe.Utils.Utils;
+import dev.ssonsallsub.mycafe.utils.Utils;
 import dev.ssonsallsub.mycafe.gps.GpsTracker;
 import dev.ssonsallsub.mycafe.gps.MyCurrentLocation;
 
