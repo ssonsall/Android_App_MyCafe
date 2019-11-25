@@ -78,7 +78,8 @@ public class MainActivity extends AppCompatActivity
 
         /*KaKao Map 사용을 위한 해시값 구하기
         * 맵이 갑자기 안뜨면 Appkey 바꾸고
-        * Hash값 다시 뽑아서 등록해보기*/
+        * Hash값 다시 뽑아서 등록해보기
+        * 컴퓨터마다 해시값이 다름*/
         Log.d("hashKey", getKeyHash(this));
 
         /*기본 맵 띄우기*/
@@ -158,7 +159,7 @@ public class MainActivity extends AppCompatActivity
         linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL); //가로 세팅
 
         coffeeBrandListView.setLayoutManager(linearLayoutManager);
-        coffeeBrandListAdapter = new CoffeeBrandListAdapter(this);
+        coffeeBrandListAdapter = new CoffeeBrandListAdapter(this,mMapView);
 
         coffeeBrandListAdapter.setCoffeeBrandData(data);
         coffeeBrandListView.setAdapter(coffeeBrandListAdapter);
@@ -228,7 +229,10 @@ public class MainActivity extends AppCompatActivity
 
             if (check_result) {
                 //위치 값을 가져올 수 있음
-                mMapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOnWithHeading);
+                //mMapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOnWithHeading);
+                //mMapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOnWithoutHeading);
+                //mMapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOnWithHeadingWithoutMapMoving);
+                mMapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOnWithoutHeadingWithoutMapMoving);
             } else {
                 // 거부한 퍼미션이 있다면 앱을 사용할 수 없는 이유를 설명해주고 앱을 종료합니다.2 가지 경우가 있습니다.
 

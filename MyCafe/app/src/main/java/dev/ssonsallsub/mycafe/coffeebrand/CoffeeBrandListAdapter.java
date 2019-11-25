@@ -10,6 +10,8 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import net.daum.mf.map.api.MapView;
+
 import java.util.ArrayList;
 
 import dev.ssonsallsub.mycafe.MainActivity;
@@ -21,8 +23,10 @@ import dev.ssonsallsub.mycafe.gps.MyCurrentLocation;
 public class CoffeeBrandListAdapter extends RecyclerView.Adapter<CoffeeBrandListAdapter.CoffeeBrandListViewHolder> {
     private ArrayList<CoffeeBrandData> coffeeBrandDataList;
     Context context;
-    public CoffeeBrandListAdapter(Context context) {
+    MapView mMapView;
+    public CoffeeBrandListAdapter(Context context, MapView mMapView) {
         this.context = context;
+        this.mMapView = mMapView;
     }
 
     public void setCoffeeBrandData(ArrayList<CoffeeBrandData> list){
@@ -71,7 +75,7 @@ public class CoffeeBrandListAdapter extends RecyclerView.Adapter<CoffeeBrandList
                         myCurrentLocation.setMyCurrentLatitude(latitude);
                         myCurrentLocation.setMyCurrentLongitude(longitude);
 
-                        Utils utils = new Utils();
+                        Utils utils = new Utils(mMapView);
                         utils.getCafeLocation(position);
                     }
                 }
