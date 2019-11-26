@@ -69,6 +69,9 @@ public class CoffeeBrandListAdapter extends RecyclerView.Adapter<CoffeeBrandList
                         GpsTracker gpsTracker = new GpsTracker(context);
                         double latitude = gpsTracker.getLatitude();
                         double longitude = gpsTracker.getLongitude();
+                        //학원좌표로 테스트
+                        //latitude = 35.155998;
+                        //longitude = 129.059499;
                         MyCurrentLocation myCurrentLocation = MyCurrentLocation.getInstance();
                         myCurrentLocation.setMyCurrentLatitude(latitude);
                         myCurrentLocation.setMyCurrentLongitude(longitude);

@@ -5,7 +5,9 @@ import java.util.ArrayList;
 public class DetailURL {
     private ArrayList<String> urlList;
 
-    private DetailURL(){}
+    private DetailURL(){
+        urlList = new ArrayList<>();
+    }
     private static DetailURL instance = new DetailURL();
     public static DetailURL getInstance(){
         return instance;

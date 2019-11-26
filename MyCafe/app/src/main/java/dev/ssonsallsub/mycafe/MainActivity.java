@@ -2,61 +2,47 @@ package dev.ssonsallsub.mycafe;
 
 import android.Manifest;
 import android.app.AlertDialog;
-
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-
 import android.content.pm.Signature;
-
 import android.location.LocationManager;
-
 import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.FrameLayout;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import net.daum.mf.map.api.MapPOIItem;
 import net.daum.mf.map.api.MapPoint;
 import net.daum.mf.map.api.MapReverseGeoCoder;
 import net.daum.mf.map.api.MapView;
-
-
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-
 import dev.ssonsallsub.mycafe.coffeebrand.CoffeeBrandData;
 import dev.ssonsallsub.mycafe.coffeebrand.CoffeeBrandListAdapter;
 import dev.ssonsallsub.mycafe.gps.GpsTracker;
 import dev.ssonsallsub.mycafe.gps.MyCurrentLocation;
-import dev.ssonsallsub.mycafe.gps.RequestCaffeLocation;
 import dev.ssonsallsub.mycafe.utils.DetailURL;
-
 import static com.kakao.util.maps.helper.Utility.getPackageInfo;
+
 /*
 * 리빌드 할 때 앱 종료하고 하기
 * 찝찝하면 앱 아예 삭제하고 리빌드
@@ -128,12 +114,15 @@ public class MainActivity extends AppCompatActivity
 
                 Log.d("LocTest","latitude >> " + latitude + ", longitude >> " + longitude);
 
-
+                //학원좌표로 테스트
+                //latitude = 35.155998;
+                //longitude = 129.059499;
                 MyCurrentLocation myCurrentLocation = MyCurrentLocation.getInstance();
                 myCurrentLocation.setMyCurrentLatitude(latitude);
                 myCurrentLocation.setMyCurrentLongitude(longitude);
 
                 mMapView.setMapCenterPoint(MapPoint.mapPointWithGeoCoord(latitude,longitude),true);
+                mMapView.setShowCurrentLocationMarker(true);
             }
         });
 
@@ -253,11 +242,12 @@ public class MainActivity extends AppCompatActivity
 
             if (check_result) {
                 //위치 값을 가져올 수 있음
-                //파라미터 안먹히네 (확신이 안선다.)
+                //앱 완전 새로 설치하고 처음 gps 설정 ok 했을때
+                //그 다움부터 앱 켤땐 저 밑에 코드 따름 has 머시기
                 //mMapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOnWithHeading);
-                //mMapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOnWithoutHeading);
+                mMapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOnWithoutHeading);
                 //mMapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOnWithHeadingWithoutMapMoving);
-                mMapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOnWithoutHeadingWithoutMapMoving);
+                //mMapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOnWithoutHeadingWithoutMapMoving);
             } else {
                 // 거부한 퍼미션이 있다면 앱을 사용할 수 없는 이유를 설명해주고 앱을 종료합니다.2 가지 경우가 있습니다.
                 if (ActivityCompat.shouldShowRequestPermissionRationale(this, REQUIRED_PERMISSIONS[0])) {
@@ -291,7 +281,7 @@ public class MainActivity extends AppCompatActivity
 
 
             // 3.  위치 값을 가져올 수 있음
-            mMapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOnWithHeading);
+            mMapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOnWithoutHeading);
 
 
         } else {  //2. 퍼미션 요청을 허용한 적이 없다면 퍼미션 요청이 필요합니다. 2가지 경우(3-1, 4-1)가 있습니다.
@@ -403,8 +393,42 @@ public class MainActivity extends AppCompatActivity
         @Override
         public void onCalloutBalloonOfPOIItemTouched(MapView mapView, MapPOIItem mapPOIItem, MapPOIItem.CalloutBalloonButtonType calloutBalloonButtonType) {
             Log.d("please", "onPOIItemSelected: 333333333333");
-            //다이얼로그 띄우기
+            //다이얼로그로 웹뷰 띄우기
             DetailURL detailURL = DetailURL.getInstance(); //웹뷰에 띄울 URL
+            final Dialog dialog = new Dialog(MainActivity.this);
+
+            dialog.setContentView(R.layout.dialog_cafe);
+            Button webviewClose = dialog.findViewById(R.id.webview_close);
+            Button webviewBack = dialog.findViewById(R.id.webview_back);
+            //dialog.setTitle("상세정보");
+
+            final WebView webView = dialog.findViewById(R.id.detail_info);
+            webView.setWebViewClient(new WebViewClient());
+
+            WebSettings settings = webView.getSettings();
+            settings.setJavaScriptEnabled(true); //자바스크립트 허용
+
+            for(int i = 0 ; i < detailURL.getUrlList().size(); i++){
+                if(mapPOIItem.getTag() == i){
+                    webView.loadUrl(detailURL.getUrlList().get(i));
+                    dialog.show();
+                }
+            }
+
+            webviewClose.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    dialog.dismiss();
+                }
+            });
+
+            webviewBack.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    webView.goBack();
+                }
+            });
+
         }
 
         @Override
