@@ -6,8 +6,18 @@
     android:background="@color/colorAccent"
     android:layout_gravity="start"
     android:id="@+id/more_menu_view"
+    android:backgroundTint="@color/colorMy"
     >
-
+    <TextView
+        android:id="@+id/btn_login"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="설정"
+        android:textSize="30dp" />
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@color/colorWhite"/>
     <TextView
         android:id="@+id/btn_close"
         android:layout_width="match_parent"
@@ -15,11 +25,9 @@
         android:clickable="true"
         android:text="닫기"
         android:textSize="30dp" />
-
-    <TextView
-        android:id="@+id/btn_login"
+    <View
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="로그인"
-        android:textSize="30dp" />
+        android:layout_height="2dp"
+        android:background="@color/colorWhite"/>
+
 </LinearLayout>

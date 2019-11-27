@@ -15,6 +15,7 @@ import net.daum.mf.map.api.MapView;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.security.spec.ECField;
 import java.util.ArrayList;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -29,29 +30,59 @@ public class Utils {
     private MyCurrentLocation myCurrentLocation = MyCurrentLocation.getInstance();
     private Context context;
     private MapView mMapView;
+    private int searchCafe;
 
     public Utils(MapView mMapView) {
         this.mMapView = mMapView;
     }
 
     public void getCafeLocation(int cafeName) {
+        //REST API로 요청
         switch (cafeName) {
             case CoffeeBrandName.All_CAFE:
-                //REST API로 요청
-                try {
+                    searchCafe = CoffeeBrandName.All_CAFE;
                     new ReqCaffeLocation().execute();
-                } catch (Exception e) {
-                }
-
                 break;
-            case CoffeeBrandName.ANGEL_IN_US:
-
+            case CoffeeBrandName.STARBUCKS:
+                    searchCafe = CoffeeBrandName.STARBUCKS;
+                    new ReqCaffeLocation().execute();
+                break;
+            case CoffeeBrandName.ANGEL:
+                    searchCafe = CoffeeBrandName.ANGEL;
+                    new ReqCaffeLocation().execute();
+                break;
+            case CoffeeBrandName.TWOSOME:
+                    searchCafe = CoffeeBrandName.TWOSOME;
+                    new ReqCaffeLocation().execute();
+                break;
+            case CoffeeBrandName.EDIYA:
+                    searchCafe = CoffeeBrandName.EDIYA;
+                    new ReqCaffeLocation().execute();
+                break;
+            case CoffeeBrandName.TOMTOM:
+                    searchCafe = CoffeeBrandName.TOMTOM;
+                    new ReqCaffeLocation().execute();
+                break;
+            case CoffeeBrandName.HOLLYS:
+                searchCafe = CoffeeBrandName.HOLLYS;
+                new ReqCaffeLocation().execute();
+                break;
+            case CoffeeBrandName.BACKDABANG:
+                searchCafe = CoffeeBrandName.BACKDABANG;
+                new ReqCaffeLocation().execute();
+                break;
+            case CoffeeBrandName.PASSCUCCI:
+                searchCafe = CoffeeBrandName.PASSCUCCI;
+                new ReqCaffeLocation().execute();
+                break;
+            case CoffeeBrandName.CAFFEBENE:
+                searchCafe = CoffeeBrandName.CAFFEBENE;
+                new ReqCaffeLocation().execute();
                 break;
             default:
                 break;
         }
-        //return null;
-    }
+     }
 
     class ReqCaffeLocation extends AsyncTask {
 
@@ -63,7 +94,9 @@ public class Utils {
 
         @Override
         protected Object doInBackground(Object[] objects) {
-            ArrayList<RequestCaffeLocation> requestCaffeLocationsList = requestRestAPI(myCurrentLocation.getMyCurrentLatitude(), myCurrentLocation.getMyCurrentLongitude());
+            ArrayList<RequestCaffeLocation> requestCaffeLocationsList =
+                    requestRestAPI(myCurrentLocation.getMyCurrentLatitude(),
+                            myCurrentLocation.getMyCurrentLongitude(), searchCafe);
             return requestCaffeLocationsList;
         }
 
@@ -93,10 +126,9 @@ public class Utils {
         }
     }
 
-    public ArrayList<RequestCaffeLocation> requestRestAPI(double y, double x) {
-        int radius = 1000; // 5km
+    public ArrayList<RequestCaffeLocation> requestRestAPI(double y, double x, int searchCafe) {
+        int radius = 2000; // 2km
         int page = 1;
-
 
 
         ArrayList<RequestCaffeLocation> requestCaffeLocationsList = new ArrayList<>();
@@ -130,21 +162,111 @@ public class Utils {
                 //받으면 gson으로 파싱해서
                 Gson gson = new Gson();
                 ResponseData responseData = gson.fromJson(inputData.toString(), ResponseData.class);
-
                 for (int i = 0; i < responseData.getDocuments().size(); i++) {
-                    RequestCaffeLocation requestCaffeLocation = new RequestCaffeLocation();
-                    requestCaffeLocation.setCaffeLatitude(Double.parseDouble(responseData.getDocuments().get(i).getY()));
-                    requestCaffeLocation.setCaffeLongitude(Double.parseDouble(responseData.getDocuments().get(i).getX()));
-                    requestCaffeLocation.setCaffeName(responseData.getDocuments().get(i).getPlaceName());
-                    requestCaffeLocation.setCaffeUrl(responseData.getDocuments().get(i).getPlaceUrl());
-                    detailURL.getUrlList().add(responseData.getDocuments().get(i).getPlaceUrl());
-                    requestCaffeLocationsList.add(requestCaffeLocation);
+                    if(!responseData.getDocuments().get(i).getCategoryName().contains("사주")) {
+                        if(!responseData.getDocuments().get(i).getCategoryName().contains("테마")) {
+                            if (searchCafe == CoffeeBrandName.All_CAFE) {
+                                RequestCaffeLocation requestCaffeLocation = new RequestCaffeLocation();
+                                requestCaffeLocation.setCaffeLatitude(Double.parseDouble(responseData.getDocuments().get(i).getY()));
+                                requestCaffeLocation.setCaffeLongitude(Double.parseDouble(responseData.getDocuments().get(i).getX()));
+                                requestCaffeLocation.setCaffeName(responseData.getDocuments().get(i).getPlaceName());
+                                requestCaffeLocation.setCaffeUrl(responseData.getDocuments().get(i).getPlaceUrl());
+                                detailURL.getUrlList().add(responseData.getDocuments().get(i).getPlaceUrl());
+                                requestCaffeLocationsList.add(requestCaffeLocation);
+                            } else if (searchCafe == CoffeeBrandName.STARBUCKS) {
+                                if (responseData.getDocuments().get(i).getCategoryName().contains("스타벅스")) {
+                                    RequestCaffeLocation requestCaffeLocation = new RequestCaffeLocation();
+                                    requestCaffeLocation.setCaffeLatitude(Double.parseDouble(responseData.getDocuments().get(i).getY()));
+                                    requestCaffeLocation.setCaffeLongitude(Double.parseDouble(responseData.getDocuments().get(i).getX()));
+                                    requestCaffeLocation.setCaffeName(responseData.getDocuments().get(i).getPlaceName());
+                                    requestCaffeLocation.setCaffeUrl(responseData.getDocuments().get(i).getPlaceUrl());
+                                    detailURL.getUrlList().add(responseData.getDocuments().get(i).getPlaceUrl());
+                                    requestCaffeLocationsList.add(requestCaffeLocation);
+                                }
+                            } else if (searchCafe == CoffeeBrandName.ANGEL) {
+                                if (responseData.getDocuments().get(i).getCategoryName().contains("엔제리너스")) {
+                                    RequestCaffeLocation requestCaffeLocation = new RequestCaffeLocation();
+                                    requestCaffeLocation.setCaffeLatitude(Double.parseDouble(responseData.getDocuments().get(i).getY()));
+                                    requestCaffeLocation.setCaffeLongitude(Double.parseDouble(responseData.getDocuments().get(i).getX()));
+                                    requestCaffeLocation.setCaffeName(responseData.getDocuments().get(i).getPlaceName());
+                                    requestCaffeLocation.setCaffeUrl(responseData.getDocuments().get(i).getPlaceUrl());
+                                    detailURL.getUrlList().add(responseData.getDocuments().get(i).getPlaceUrl());
+                                    requestCaffeLocationsList.add(requestCaffeLocation);
+                                }
+                            } else if (searchCafe == CoffeeBrandName.TWOSOME) {
+                                if (responseData.getDocuments().get(i).getCategoryName().contains("투썸플레이스")) {
+                                    RequestCaffeLocation requestCaffeLocation = new RequestCaffeLocation();
+                                    requestCaffeLocation.setCaffeLatitude(Double.parseDouble(responseData.getDocuments().get(i).getY()));
+                                    requestCaffeLocation.setCaffeLongitude(Double.parseDouble(responseData.getDocuments().get(i).getX()));
+                                    requestCaffeLocation.setCaffeName(responseData.getDocuments().get(i).getPlaceName());
+                                    requestCaffeLocation.setCaffeUrl(responseData.getDocuments().get(i).getPlaceUrl());
+                                    detailURL.getUrlList().add(responseData.getDocuments().get(i).getPlaceUrl());
+                                    requestCaffeLocationsList.add(requestCaffeLocation);
+                                }
+                            } else if (searchCafe == CoffeeBrandName.EDIYA) {
+                                if (responseData.getDocuments().get(i).getCategoryName().contains("이디야커피")) {
+                                    RequestCaffeLocation requestCaffeLocation = new RequestCaffeLocation();
+                                    requestCaffeLocation.setCaffeLatitude(Double.parseDouble(responseData.getDocuments().get(i).getY()));
+                                    requestCaffeLocation.setCaffeLongitude(Double.parseDouble(responseData.getDocuments().get(i).getX()));
+                                    requestCaffeLocation.setCaffeName(responseData.getDocuments().get(i).getPlaceName());
+                                    requestCaffeLocation.setCaffeUrl(responseData.getDocuments().get(i).getPlaceUrl());
+                                    detailURL.getUrlList().add(responseData.getDocuments().get(i).getPlaceUrl());
+                                    requestCaffeLocationsList.add(requestCaffeLocation);
+                                }
+                            } else if (searchCafe == CoffeeBrandName.TOMTOM) {
+                                if (responseData.getDocuments().get(i).getCategoryName().contains("탐앤탐스")) {
+                                    RequestCaffeLocation requestCaffeLocation = new RequestCaffeLocation();
+                                    requestCaffeLocation.setCaffeLatitude(Double.parseDouble(responseData.getDocuments().get(i).getY()));
+                                    requestCaffeLocation.setCaffeLongitude(Double.parseDouble(responseData.getDocuments().get(i).getX()));
+                                    requestCaffeLocation.setCaffeName(responseData.getDocuments().get(i).getPlaceName());
+                                    requestCaffeLocation.setCaffeUrl(responseData.getDocuments().get(i).getPlaceUrl());
+                                    detailURL.getUrlList().add(responseData.getDocuments().get(i).getPlaceUrl());
+                                    requestCaffeLocationsList.add(requestCaffeLocation);
+                                }
+                            }else if (searchCafe == CoffeeBrandName.HOLLYS) {
+                                if (responseData.getDocuments().get(i).getCategoryName().contains("할리스커피")) {
+                                    RequestCaffeLocation requestCaffeLocation = new RequestCaffeLocation();
+                                    requestCaffeLocation.setCaffeLatitude(Double.parseDouble(responseData.getDocuments().get(i).getY()));
+                                    requestCaffeLocation.setCaffeLongitude(Double.parseDouble(responseData.getDocuments().get(i).getX()));
+                                    requestCaffeLocation.setCaffeName(responseData.getDocuments().get(i).getPlaceName());
+                                    requestCaffeLocation.setCaffeUrl(responseData.getDocuments().get(i).getPlaceUrl());
+                                    detailURL.getUrlList().add(responseData.getDocuments().get(i).getPlaceUrl());
+                                    requestCaffeLocationsList.add(requestCaffeLocation);
+                                }
+                            }else if (searchCafe == CoffeeBrandName.BACKDABANG) {
+                                if (responseData.getDocuments().get(i).getCategoryName().contains("빽다방")) {
+                                    RequestCaffeLocation requestCaffeLocation = new RequestCaffeLocation();
+                                    requestCaffeLocation.setCaffeLatitude(Double.parseDouble(responseData.getDocuments().get(i).getY()));
+                                    requestCaffeLocation.setCaffeLongitude(Double.parseDouble(responseData.getDocuments().get(i).getX()));
+                                    requestCaffeLocation.setCaffeName(responseData.getDocuments().get(i).getPlaceName());
+                                    requestCaffeLocation.setCaffeUrl(responseData.getDocuments().get(i).getPlaceUrl());
+                                    detailURL.getUrlList().add(responseData.getDocuments().get(i).getPlaceUrl());
+                                    requestCaffeLocationsList.add(requestCaffeLocation);
+                                }
+                            }else if (searchCafe == CoffeeBrandName.PASSCUCCI) {
+                                if (responseData.getDocuments().get(i).getCategoryName().contains("파스쿠찌")) {
+                                    RequestCaffeLocation requestCaffeLocation = new RequestCaffeLocation();
+                                    requestCaffeLocation.setCaffeLatitude(Double.parseDouble(responseData.getDocuments().get(i).getY()));
+                                    requestCaffeLocation.setCaffeLongitude(Double.parseDouble(responseData.getDocuments().get(i).getX()));
+                                    requestCaffeLocation.setCaffeName(responseData.getDocuments().get(i).getPlaceName());
+                                    requestCaffeLocation.setCaffeUrl(responseData.getDocuments().get(i).getPlaceUrl());
+                                    detailURL.getUrlList().add(responseData.getDocuments().get(i).getPlaceUrl());
+                                    requestCaffeLocationsList.add(requestCaffeLocation);
+                                }
+                            }else if (searchCafe == CoffeeBrandName.CAFFEBENE) {
+                                if (responseData.getDocuments().get(i).getCategoryName().contains("카페베네")) {
+                                    RequestCaffeLocation requestCaffeLocation = new RequestCaffeLocation();
+                                    requestCaffeLocation.setCaffeLatitude(Double.parseDouble(responseData.getDocuments().get(i).getY()));
+                                    requestCaffeLocation.setCaffeLongitude(Double.parseDouble(responseData.getDocuments().get(i).getX()));
+                                    requestCaffeLocation.setCaffeName(responseData.getDocuments().get(i).getPlaceName());
+                                    requestCaffeLocation.setCaffeUrl(responseData.getDocuments().get(i).getPlaceUrl());
+                                    detailURL.getUrlList().add(responseData.getDocuments().get(i).getPlaceUrl());
+                                    requestCaffeLocationsList.add(requestCaffeLocation);
+                                }
+                            }
+                        }
+                    }
                 }
-
-                //위에건 All Cafe일때이고
-                //이 함수에 파라미터로 포지션 값 넘어온거 받아서
-                //if로 for문 각각 작성 밑에 거에 contains 걸어서 걸러내자.
-                //responseData.getDocuments().get(i).getCategoryName()
 
                 /*15개 이상 결과가 있을 시 최대 45개까지 데이터를 뽑아온다*/
                 /*레퍼런스에는 15*45개까지지만 어떤 이유에서인지 45개까지가 맥스다*/

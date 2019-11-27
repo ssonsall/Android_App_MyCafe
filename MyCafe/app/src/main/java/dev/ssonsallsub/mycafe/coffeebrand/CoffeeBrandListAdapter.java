@@ -1,6 +1,8 @@
 package dev.ssonsallsub.mycafe.coffeebrand;
 
 import android.content.Context;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.OvalShape;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -58,10 +60,12 @@ public class CoffeeBrandListAdapter extends RecyclerView.Adapter<CoffeeBrandList
         public CoffeeBrandListViewHolder(View itemView) {
             super(itemView);
             logo = itemView.findViewById(R.id.coffee_brand_logo);
+            logo.setBackground(new ShapeDrawable(new OvalShape()));
+            logo.setClipToOutline(true);
             logo.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    /*세팅된 버튼 순서대로 현재 상태라면 -> 0: all , 2: 엔젤.....*/
+                    /*세팅된 버튼 순서대로 현재 상태라면 -> 0: all , 1: 스벅, 2: 엔젤 ...*/
                     int position = getAdapterPosition();
                     if(position != RecyclerView.NO_POSITION){
 
@@ -70,8 +74,8 @@ public class CoffeeBrandListAdapter extends RecyclerView.Adapter<CoffeeBrandList
                         double latitude = gpsTracker.getLatitude();
                         double longitude = gpsTracker.getLongitude();
                         //학원좌표로 테스트
-                        //latitude = 35.155998;
-                        //longitude = 129.059499;
+//                        latitude = 35.155998;
+//                        longitude = 129.059499;
                         MyCurrentLocation myCurrentLocation = MyCurrentLocation.getInstance();
                         myCurrentLocation.setMyCurrentLatitude(latitude);
                         myCurrentLocation.setMyCurrentLongitude(longitude);

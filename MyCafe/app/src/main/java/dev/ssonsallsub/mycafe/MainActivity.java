@@ -29,6 +29,8 @@ import androidx.core.content.ContextCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+
 import net.daum.mf.map.api.MapPOIItem;
 import net.daum.mf.map.api.MapPoint;
 import net.daum.mf.map.api.MapReverseGeoCoder;
@@ -42,11 +44,6 @@ import dev.ssonsallsub.mycafe.gps.GpsTracker;
 import dev.ssonsallsub.mycafe.gps.MyCurrentLocation;
 import dev.ssonsallsub.mycafe.utils.DetailURL;
 import static com.kakao.util.maps.helper.Utility.getPackageInfo;
-
-/*
-* 리빌드 할 때 앱 종료하고 하기
-* 찝찝하면 앱 아예 삭제하고 리빌드
-* */
 
 public class MainActivity extends AppCompatActivity
         implements MapView.CurrentLocationEventListener,
@@ -78,10 +75,8 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
 
         /*KaKao Map 사용을 위한 해시값 구하기
-        * 맵이 갑자기 안뜨면 Appkey 바꾸고
-        * Hash값 다시 뽑아서 등록해보기
-        * 컴퓨터마다 해시값이 다름*/
-        Log.d("hashKey", getKeyHash(this));
+          * 컴퓨터마다 해시값이 다름*/
+        //Log.d("hashKey", getKeyHash(this));
 
         /*기본 맵 띄우기*/
         mMapView = new MapView(this);
@@ -115,8 +110,8 @@ public class MainActivity extends AppCompatActivity
                 Log.d("LocTest","latitude >> " + latitude + ", longitude >> " + longitude);
 
                 //학원좌표로 테스트
-                //latitude = 35.155998;
-                //longitude = 129.059499;
+//                latitude = 35.155998;
+//                longitude = 129.059499;
                 MyCurrentLocation myCurrentLocation = MyCurrentLocation.getInstance();
                 myCurrentLocation.setMyCurrentLatitude(latitude);
                 myCurrentLocation.setMyCurrentLongitude(longitude);
@@ -151,18 +146,16 @@ public class MainActivity extends AppCompatActivity
         ArrayList<CoffeeBrandData> data = new ArrayList<>();
 
         data.add(new CoffeeBrandData(R.mipmap.logo_allcafe_round));
+        data.add(new CoffeeBrandData(R.mipmap.logo_starbucks));
         data.add(new CoffeeBrandData(R.mipmap.logo_angelinus_round));
-        data.add(new CoffeeBrandData(R.mipmap.logo_caffebene_round));
+        data.add(new CoffeeBrandData(R.mipmap.logo_twosome_round));
+        data.add(new CoffeeBrandData(R.mipmap.logo_ediya_round));
+        data.add(new CoffeeBrandData(R.mipmap.logo_tomtom_round));
         data.add(new CoffeeBrandData(R.mipmap.logo_hollys_round));
         data.add(new CoffeeBrandData(R.mipmap.logo_backdabang_round));
-        data.add(new CoffeeBrandData(R.mipmap.logo_ediya_round));
-        data.add(new CoffeeBrandData(R.mipmap.logo_davinci_round));
-        data.add(new CoffeeBrandData(R.mipmap.logo_tomtom_round));
         data.add(new CoffeeBrandData(R.mipmap.logo_pascucci_round));
-        data.add(new CoffeeBrandData(R.mipmap.logo_coffeebay_round));
-        data.add(new CoffeeBrandData(R.mipmap.logo_compose_round));
-        data.add(new CoffeeBrandData(R.mipmap.logo_starbucks_round));
-        data.add(new CoffeeBrandData(R.mipmap.logo_twosome_round));
+        data.add(new CoffeeBrandData(R.mipmap.logo_caffebene_round));
+
 
 
         linearLayoutManager = new LinearLayoutManager(this);
@@ -245,7 +238,7 @@ public class MainActivity extends AppCompatActivity
                 //앱 완전 새로 설치하고 처음 gps 설정 ok 했을때
                 //그 다움부터 앱 켤땐 저 밑에 코드 따름 has 머시기
                 //mMapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOnWithHeading);
-                mMapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOnWithoutHeading);
+                mMapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOnWithoutHeadingWithoutMapMoving);
                 //mMapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOnWithHeadingWithoutMapMoving);
                 //mMapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOnWithoutHeadingWithoutMapMoving);
             } else {
@@ -281,7 +274,7 @@ public class MainActivity extends AppCompatActivity
 
 
             // 3.  위치 값을 가져올 수 있음
-            mMapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOnWithoutHeading);
+            mMapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOnWithoutHeadingWithoutMapMoving);
 
 
         } else {  //2. 퍼미션 요청을 허용한 적이 없다면 퍼미션 요청이 필요합니다. 2가지 경우(3-1, 4-1)가 있습니다.
@@ -372,7 +365,7 @@ public class MainActivity extends AppCompatActivity
                 md.update(signature.toByteArray());
                 return Base64.encodeToString(md.digest(), Base64.NO_WRAP);
             } catch (NoSuchAlgorithmException e) {
-                Log.w("ttttt", "Unable to get MessageDigest. signature=" + signature, e);
+
             }
         }
         return null;
@@ -400,7 +393,6 @@ public class MainActivity extends AppCompatActivity
             dialog.setContentView(R.layout.dialog_cafe);
             Button webviewClose = dialog.findViewById(R.id.webview_close);
             Button webviewBack = dialog.findViewById(R.id.webview_back);
-            //dialog.setTitle("상세정보");
 
             final WebView webView = dialog.findViewById(R.id.detail_info);
             webView.setWebViewClient(new WebViewClient());
@@ -433,7 +425,6 @@ public class MainActivity extends AppCompatActivity
 
         @Override
         public void onDraggablePOIItemMoved(MapView mapView, MapPOIItem mapPOIItem, MapPoint mapPoint) {
-            Log.d("please", "onPOIItemSelected: 444444444444444");
         }
     }
 }

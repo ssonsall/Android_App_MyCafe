@@ -12,5 +12,6 @@
         android:layout_weight="1"
         app:srcCompat="@mipmap/ic_launcher"
         android:clickable="true"
-        android:layout_marginRight="40dp"/>
+        android:layout_marginRight="40dp"
+        />
 </LinearLayout>
